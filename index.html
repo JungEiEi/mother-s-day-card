@@ -275,9 +275,64 @@
     .message .greeting { font-size: 1.15rem; }
     .message p { font-size: 0.92rem; }
   }
+
+  /* ===== Jasmine Falling Animation ===== */
+  .jasmine-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .jasmine {
+    position: absolute;
+    top: -70px;
+    width: var(--size);
+    height: var(--size);
+    opacity: var(--opacity);
+    animation:
+      jasmineFall var(--duration) linear forwards,
+      jasmineSway 3s ease-in-out infinite alternate;
+    filter: drop-shadow(0 3px 4px rgba(80, 100, 80, 0.15));
+    will-change: transform, margin-left;
+  }
+
+  .jasmine svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  @keyframes jasmineFall {
+    0% {
+      transform: translateY(-80px) rotate(0deg);
+    }
+    100% {
+      transform: translateY(calc(100vh + 120px)) rotate(var(--rotate));
+    }
+  }
+
+  @keyframes jasmineSway {
+    0% { margin-left: -18px; }
+    100% { margin-left: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jasmine {
+      animation: none;
+      display: none;
+    }
+  }
+
 </style>
 </head>
 <body data-theme="pink">
+
+  <div class="jasmine-layer" id="jasmineLayer"></div>
+
   <div class="header">
     <h1>✿ การ์ดวันแม่ ✿</h1>
     <p>แตะที่การ์ดเพื่อเปิด</p>
@@ -337,6 +392,52 @@
         document.body.setAttribute('data-theme', btn.dataset.theme);
       });
     });
+
+    /* ===== Falling Jasmine ===== */
+    const jasmineLayer = document.getElementById('jasmineLayer');
+
+    function createJasmine() {
+      const flower = document.createElement('div');
+      flower.className = 'jasmine';
+
+      const size = Math.random() * 22 + 20;
+      const duration = Math.random() * 5 + 7;
+      const opacity = Math.random() * 0.35 + 0.55;
+      const rotate = (Math.random() * 500 + 180) + 'deg';
+
+      flower.style.left = Math.random() * 100 + 'vw';
+      flower.style.setProperty('--size', size + 'px');
+      flower.style.setProperty('--duration', duration + 's');
+      flower.style.setProperty('--opacity', opacity);
+      flower.style.setProperty('--rotate', rotate);
+
+      flower.innerHTML = `
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffffff" stroke="#e8eee9" stroke-width="1.5">
+            <ellipse cx="50" cy="27" rx="18" ry="28"/>
+            <ellipse cx="72" cy="43" rx="18" ry="28" transform="rotate(72 72 43)"/>
+            <ellipse cx="64" cy="70" rx="18" ry="28" transform="rotate(144 64 70)"/>
+            <ellipse cx="36" cy="70" rx="18" ry="28" transform="rotate(216 36 70)"/>
+            <ellipse cx="28" cy="43" rx="18" ry="28" transform="rotate(288 28 43)"/>
+          </g>
+          <circle cx="50" cy="50" r="9" fill="#f4df9b"/>
+          <circle cx="50" cy="50" r="4" fill="#e7c967"/>
+        </svg>
+      `;
+
+      jasmineLayer.appendChild(flower);
+
+      setTimeout(() => {
+        flower.remove();
+      }, duration * 1000);
+    }
+
+    setInterval(createJasmine, 650);
+
+    for (let i = 0; i < 8; i++) {
+      setTimeout(createJasmine, i * 250);
+    }
+
   </script>
 </body>
 </html>
